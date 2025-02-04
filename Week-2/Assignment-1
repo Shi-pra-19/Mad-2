@@ -1,0 +1,258 @@
+/* Abstract:
+*
+* Write method definitions to manage Cafe.
+*
+* Product defines a product with its name, price and number of items in stock
+* A cafe is initialized with an array of products, array of instances of CustomerProducts class, and balance amount
+* A customer with a customer_id can buy things if it's available in the Cafe.
+*
+* The stock should be reduced based on the buy request
+* Cafe balance amount should be updated
+* Customer history is maintained
+*
+* A customer with a customer_id can return things if he/she has bought before
+*
+* Check in the customer_products, if he/she has bought before
+* If yes, reduce or remove accordingly
+* Increase the stock
+* Update the balance
+*/
+
+/*
+ * buyProduct makes a purchase in the cafe, and does the following:
+ * 1. Reduces the stock of a product based on the buy request
+ * 2. Updates the cafe balance based on the buy request
+ * 3. Creates and add the CustomerProducts instance to the customer_products of Cafe class
+ *
+ * @param {number} customer_id - unique ID of customer
+ * @param {object} product - object of Product class
+ * @param {number} count - number of items (quantity) to be purchased
+ * @return {boolean} 
+ *
+ * The method should return true if the purchase is successful, and false in the following cases:
+ * 1. Product is not available in Cafe
+ * 2. The quantity to be puchased is more than the current stock of a product
+*/
+
+/*
+ * returnProduct makes a return of a purchase in the cafe, and does the following:
+ * 1. Updates the stock of a particular product based on the return request
+ * 2. Updates the cafe balance based on the return request
+ * 3. Updates or deletes the CustomerProducts instance to the customer_products of Cafe class (delete in case of a full return)
+ *
+ * @param {number} customer_id - unique ID of customer
+ * @param {object} product - object of Product class
+ * @param {number} count - number of items (quantity) to be returned
+ * @return {boolean} 
+ *
+ * The method should return true if the return is successful, and false in the following cases:
+ * 1. No such purchase was made from the Cafe
+ * 2. The quantity to be returned is more than the quantity purchased
+*/
+
+/*
+ * getCurrentBalance return the current balance of the Cafe
+*/
+
+
+class Product {
+ 
+  constructor(name, price, stock) {
+    this.name = name;
+    this.price = price;
+    this.stock = stock;
+  }
+
+}
+
+class CustomerProducts {
+
+  constructor(customer_id, product, count) {
+    this.customer_id = customer_id;
+    this.product = product;
+    this.count = count;
+  }
+
+}
+
+class Cafe {
+
+  constructor(products, balance) {
+    this.products = products;
+    this.balance = balance;
+    //Maintain the customer history
+    this.customer_products = [];
+  }
+
+
+// Method to buy a product
+  buyProduct(customer_id, product, count) {
+    const cafeProduct = this.products.find(p => p.name === product.name);
+
+    // Check if the product is available and has enough stock
+    if (!cafeProduct || cafeProduct.stock < count) {
+      return false;
+    }
+
+    // Update stock, balance, and customer history
+    cafeProduct.stock -= count;
+    this.balance += product.price * count;
+
+    const existingCustomerProduct = this.customer_products.find(
+      cp => cp.customer_id === customer_id && cp.product.name === product.name
+    );
+
+    if (existingCustomerProduct) {
+      existingCustomerProduct.count += count;
+    } else {
+      this.customer_products.push(new CustomerProducts(customer_id, product, count));
+    }
+
+    return true;
+  }
+
+  // Method to return a product
+  returnProduct(customer_id, product, count) {
+    const customerProduct = this.customer_products.find(
+      cp => cp.customer_id === customer_id && cp.product.name === product.name
+    );
+
+    // Check if the product was purchased and if the return count is valid
+    if (!customerProduct || customerProduct.count < count) {
+      return false;
+    }
+
+    // Update stock, balance, and customer history
+    customerProduct.count -= count;
+    const cafeProduct = this.products.find(p => p.name === product.name);
+    cafeProduct.stock += count;
+    this.balance -= product.price * count;
+
+    if (customerProduct.count === 0) {
+      // Remove the record if the product count becomes zero
+      const index = this.customer_products.indexOf(customerProduct);
+      this.customer_products.splice(index, 1);
+    }
+
+    return true;
+  }
+
+  // Method to get the current balance of the cafe
+  getCurrentBalance() {
+    return this.balance;
+  }
+
+
+}/*
+ * calculateSimpleInterest calculates and returns the simple interest
+ * (floor value) for a fixed deposit. Formula used is,
+
+ * calculateSimpleInterest calculates and returns the simple interest
+ * for a fixed deposit. Formula used is,
+ * Simple Interest: P X R X T / 100
+ *   where:
+ *   P = Principal
+ *   I = Daily interest rate
+ *   N = Number of days
+ *
+ *  In case of any input error (wrong date format, alphabets in daily interest etc.), return -1
+ *
+ * @param {number} principal  - Principal amount
+ * @param {number} dailyInterest  - daily interest rate
+ * @param {string} startingDate  - Starting date of the fixed deposit in "YYYY-MM-DD" format, example "2015-03-25"
+ * @param {string} endingDate  - Ending date of the fixed deposit in "YYYY-MM-DD" format, example "2015-03-25"
+ * @return {number} interest
+*/
+
+/*
+ * calculateCompoundInterest calculates and returns the compound interest
+ * (floor value) for a fixed deposit. Formula used is,
+ *   Compound Interest=P[(1+I/100)^N - 1]
+ *   where:
+ *   P = Principal
+ *   I = Daily interest rate
+ *   N = Number of days
+ *
+ *  In case of any input error (wrong date format, alphabets in daily interest etc.), return -1
+ *
+ * @param {number} principal  - Principal amount
+ * @param {number} dailyInterest  - daily interest rate
+ * @param {string} startingDate  - Starting date of the fixed deposit in "YYYY-MM-DD" format, example "2015-03-25"
+ * @param {string} endingDate  - Ending date of the fixed deposit in "YYYY-MM-DD" format, example "2015-03-25"
+ * @return {number} interest
+*/
+
+/*
+ * extraAmountPercentage calculates and returns the extra amount percentage borrower will have to pay in case of
+ * compound interest (floor value) in comparison to the simple interest for a fixed deposit.
+
+ *  In case of any input error (wrong date format, alphabets in daily interest etc.), return -1
+ *
+ * @param {number} principal  - Principal amount
+ * @param {number} dailyInterest  - Daily interest rate.
+ * @param {string} startingDate  - Starting date of the fixed deposit in "YYYY-MM-DD" format, example "2015-03-25"
+ * @param {string} endingDate  - Ending date of the fixed deposit in "YYYY-MM-DD" format, example "2015-03-25"
+ * @return {number} percentage
+*/
+
+function calculateSimpleInterest(principal, dailyInterest, startingDate, endingDate) {
+  // Validate inputs
+  if (isNaN(principal) || isNaN(dailyInterest) || isNaN(Date.parse(startingDate)) || isNaN(Date.parse(endingDate))) {
+    return -1;
+  }
+
+  // Parse dates
+  const start = new Date(startingDate);
+  const end = new Date(endingDate);
+
+  // Calculate number of days
+  const timeInMillis = end - start;
+  if (timeInMillis < 0) return -1; // Invalid date range
+
+  const days = timeInMillis / (1000 * 3600 * 24);
+
+  // Simple Interest formula: P * R * T / 100
+  const interest = Math.floor((principal * dailyInterest * days) / 100);
+  return interest;
+}
+
+function calculateCompoundInterest(principal, dailyInterest, startingDate, endingDate) {
+  // Validate inputs
+  if (isNaN(principal) || isNaN(dailyInterest) || isNaN(Date.parse(startingDate)) || isNaN(Date.parse(endingDate))) {
+    return -1;
+  }
+
+  // Parse dates
+  const start = new Date(startingDate);
+  const end = new Date(endingDate);
+
+  // Calculate number of days
+  const timeInMillis = end - start;
+  if (timeInMillis < 0) return -1; // Invalid date range
+
+  const days = timeInMillis / (1000 * 3600 * 24);
+
+  // Compound Interest formula: P[(1 + I/100)^N - 1]
+  const compoundInterest = Math.floor(principal * (Math.pow(1 + dailyInterest / 100, days) - 1));
+  return compoundInterest;
+}
+
+function extraAmountPercentage(principal, dailyInterest, startingDate, endingDate) {
+  // Validate inputs
+  if (isNaN(principal) || isNaN(dailyInterest) || isNaN(Date.parse(startingDate)) || isNaN(Date.parse(endingDate))) {
+    return -1;
+  }
+
+  // Calculate Simple Interest
+  const simpleInterest = calculateSimpleInterest(principal, dailyInterest, startingDate, endingDate);
+  if (simpleInterest === -1) return -1;
+
+  // Calculate Compound Interest
+  const compoundInterest = calculateCompoundInterest(principal, dailyInterest, startingDate, endingDate);
+  if (compoundInterest === -1) return -1;
+
+  // Calculate extra amount percentage
+  const extraAmount = compoundInterest - simpleInterest;
+  const percentage = Math.floor((extraAmount / simpleInterest) * 100);
+  return percentage;
+}
